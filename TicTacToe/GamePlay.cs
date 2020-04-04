@@ -27,6 +27,7 @@ namespace TicTacToeLibrary
         private List<Mark> marks = null;
         private bool gameEnd;
         private bool player1Turn;
+        private int scorePlayer1 = 0, scorePlayer2 = 0;
         //Constructor
         public GamePlay()
         {
@@ -51,6 +52,20 @@ namespace TicTacToeLibrary
             {
                 player1Turn = value;
             }
+        }
+        /// <summary>
+        /// get score of first player
+        /// </summary>
+        public int Player1Score
+        {
+            get { return scorePlayer1; }
+        }
+        /// <summary>
+        /// get score of secondplayer
+        /// </summary>
+        public int Player2Score
+        {
+            get { return scorePlayer2; }
         }
         /// <summary>
         /// Method play() will set player turn and mark type 
@@ -173,6 +188,22 @@ namespace TicTacToeLibrary
 
             return null; //return null list if the cells are all marked
            
+        }
+
+        public void CountScores()
+        {
+            if(gameEnd && !marks.Any(mark => mark.MarkId == Mark.MarkID.Blank))
+            {
+                //do nothing to scores if games end with all cells marked and no one win
+            }
+            else if(gameEnd && player1Turn)
+            {
+                scorePlayer2 += 1;
+            }
+            else if (gameEnd && !player1Turn)
+            {
+                scorePlayer1 += 1;
+            }
         }
 
         //Helper method
