@@ -8,33 +8,28 @@ using System.ServiceModel;
 namespace TicTacToeLibrary
 {
     //define a Service contract for GamePlay class
-    //[ServiceContract]
-    //public interface IGame
-    //{
-    //    [OperationContract]
-    //    void Play(bool player1Try, int cellPosition);
-    //    [OperationContract]
-    //    string getMark(int cellPosition);
-    //    [OperationContract]
-    //    List<Mark> checkWinner();
-    //    bool GameEnd {[OperationContract] get; }
-    //    bool Player1Turn { [OperationContract] get; [OperationContract] set; }
-    //}
-    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-
+    [ServiceContract]
     public interface IGame
     {
-        void CreateNewGame();
+        [OperationContract]
         void Play(bool player1Try, int cellPosition);
+        [OperationContract]
         string GetMark(int cellPosition);
+        [OperationContract]
         List<int> CheckWinner();
+        [OperationContract]
         void CountScores();
-        bool GameEnd { get; }
-        bool Player1Turn { get; set; }
-        int Player1Score { get; }
-        int Player2Score { get; }
+        [OperationContract]
+        void CreateNewGame();
+        bool GameEnd { [OperationContract] get; }
+        bool Player1Turn { [OperationContract] get; [OperationContract] set; }
+        int Player1Score { [OperationContract] get; }
+        int Player2Score { [OperationContract] get; }
+
     }
 
+
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GamePlay : IGame
     //public class GamePlay
     {
@@ -206,12 +201,8 @@ namespace TicTacToeLibrary
         }
 
         public void CountScores()
-        {
-            if (gameEnd && !marks.Any(mark => mark.MarkId == Mark.MarkID.Blank))
-            {
-                //do nothing to scores if games end with all cells marked and no one win
-            }
-            else if (gameEnd && player1Turn)
+        {            
+            if (gameEnd && player1Turn)
             {
                 scorePlayer2 += 1;
             }
