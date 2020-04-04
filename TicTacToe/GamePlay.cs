@@ -18,14 +18,12 @@ namespace TicTacToeLibrary
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IGame
     {
-        [OperationContract(IsOneWay = true)]
-        void Play(bool player1Try, int cellPosition);
+        [OperationContract]
+        bool Play(bool player1Try, int cellPosition);
         [OperationContract]
         string GetMark(int cellPosition);
         [OperationContract]
         List<int> CheckWinner();
-        [OperationContract(IsOneWay = true)]
-        void CountScores();
         [OperationContract(IsOneWay = true)]
         void CreateNewGame();
         bool GameEnd { [OperationContract] get; }
@@ -119,11 +117,13 @@ namespace TicTacToeLibrary
         /// </summary>
         /// <param name="player1Try"></param>
         /// <param name="cellPosition"></param>
-        public void Play (bool player1Try, int cellPosition)
+        public bool Play (bool player1Try, int cellPosition)
         {
+            bool isEmptyCell = false;
             //if the selected cell has been empty, then move forwards with player turn and mark set up, or else do nothing
             if (marks[cellPosition].MarkId == Mark.MarkID.Blank)
             {
+                isEmptyCell = true;
                 //player 1 turn will mark X to blank cell
                 if (player1Try)
                 {
@@ -137,6 +137,7 @@ namespace TicTacToeLibrary
                 }
                 updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
             }
+            return isEmptyCell;
         }
 
         public string GetMark(int cellPosition)
@@ -159,7 +160,7 @@ namespace TicTacToeLibrary
                 winners.Add(0);
                 winners.Add(1);
                 winners.Add(2);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd horizontal row has same value
             if (marks[3].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[3].MarkId) && (marks[5].MarkId == marks[3].MarkId))
@@ -168,7 +169,7 @@ namespace TicTacToeLibrary
                 winners.Add(3);
                 winners.Add(4);
                 winners.Add(5);
-                return winners;
+                //return winners;
             }
             // 3 cells on 3rd horizontal row has same value
             if (marks[6].MarkId != Mark.MarkID.Blank && (marks[7].MarkId == marks[6].MarkId) && (marks[8].MarkId == marks[6].MarkId))
@@ -177,7 +178,7 @@ namespace TicTacToeLibrary
                 winners.Add(6);
                 winners.Add(7);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
 
             //check vertical line
@@ -188,7 +189,7 @@ namespace TicTacToeLibrary
                 winners.Add(0);
                 winners.Add(3);
                 winners.Add(6);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd vertical column has same value
             if (marks[1].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[1].MarkId) && (marks[7].MarkId == marks[1].MarkId))
@@ -197,7 +198,7 @@ namespace TicTacToeLibrary
                 winners.Add(1);
                 winners.Add(4);
                 winners.Add(7);
-                return winners;
+                //return winners;
             }
             // 3 cells on 3rd vertical column has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[5].MarkId == marks[2].MarkId) && (marks[8].MarkId == marks[2].MarkId))
@@ -206,7 +207,7 @@ namespace TicTacToeLibrary
                 winners.Add(2);
                 winners.Add(5);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
 
             //check diagonal line
@@ -217,7 +218,7 @@ namespace TicTacToeLibrary
                 winners.Add(0);
                 winners.Add(4);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd diagonal line (top right to bottom left) has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[2].MarkId) && (marks[6].MarkId == marks[2].MarkId))
@@ -226,7 +227,7 @@ namespace TicTacToeLibrary
                 winners.Add(2);
                 winners.Add(4);
                 winners.Add(6);
-                return winners;
+                //return winners;
             }
 
             //if all cells are marked and gameEnd is still false, set the gameEnd to true
@@ -235,7 +236,10 @@ namespace TicTacToeLibrary
                 gameEnd = true;
             }
 
-            return null; //return null list if the cells are all marked
+            if (winners.Count != 0)
+                CountScores();
+
+            return winners; //return null list if the cells are all marked
            
         }
 
