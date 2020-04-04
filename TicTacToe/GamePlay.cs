@@ -84,35 +84,35 @@ namespace TicTacToeLibrary
         /// this method check winning pattern and return a list of cells that form the that winning pattern
         /// </summary>
         /// <returns></returns>
-        public List<Mark> checkWinner() //@Jason: you can use this return list of winning cells to highlight them in the UI
+        public List<int> checkWinner() //@Jason: you can use this return list of winning cells to highlight them in the UI
         {
-            List<Mark> winners = new List<Mark>();
+            List<int> winners = new List<int>();
             //check horizontal line
             // 3 cells on 1st horizontal row has same value
             if(marks[0].MarkId != Mark.MarkID.Blank && (marks[1].MarkId == marks[0].MarkId) && (marks[2].MarkId == marks[0].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[0]);
-                winners.Add(marks[1]);
-                winners.Add(marks[2]);
+                winners.Add(0);
+                winners.Add(1);
+                winners.Add(2);
                 return winners;
             }
             // 3 cells on 2nd horizontal row has same value
             if (marks[3].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[3].MarkId) && (marks[5].MarkId == marks[3].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[3]);
-                winners.Add(marks[4]);
-                winners.Add(marks[5]);
+                winners.Add(3);
+                winners.Add(4);
+                winners.Add(5);
                 return winners;
             }
             // 3 cells on 3rd horizontal row has same value
             if (marks[6].MarkId != Mark.MarkID.Blank && (marks[7].MarkId == marks[6].MarkId) && (marks[8].MarkId == marks[6].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[6]);
-                winners.Add(marks[7]);
-                winners.Add(marks[8]);
+                winners.Add(6);
+                winners.Add(7);
+                winners.Add(8);
                 return winners;
             }
 
@@ -121,27 +121,27 @@ namespace TicTacToeLibrary
             if (marks[0].MarkId != Mark.MarkID.Blank && (marks[3].MarkId == marks[0].MarkId) && (marks[6].MarkId == marks[0].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[0]);
-                winners.Add(marks[3]);
-                winners.Add(marks[6]);
+                winners.Add(0);
+                winners.Add(3);
+                winners.Add(6);
                 return winners;
             }
             // 3 cells on 2nd vertical column has same value
             if (marks[1].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[1].MarkId) && (marks[7].MarkId == marks[1].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[1]);
-                winners.Add(marks[4]);
-                winners.Add(marks[7]);
+                winners.Add(1);
+                winners.Add(4);
+                winners.Add(7);
                 return winners;
             }
             // 3 cells on 3rd vertical column has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[5].MarkId == marks[2].MarkId) && (marks[8].MarkId == marks[2].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[2]);
-                winners.Add(marks[5]);
-                winners.Add(marks[8]);
+                winners.Add(2);
+                winners.Add(5);
+                winners.Add(8);
                 return winners;
             }
 
@@ -150,18 +150,18 @@ namespace TicTacToeLibrary
             if (marks[0].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[0].MarkId) && (marks[8].MarkId == marks[0].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[0]);
-                winners.Add(marks[4]);
-                winners.Add(marks[8]);
+                winners.Add(0);
+                winners.Add(4);
+                winners.Add(8);
                 return winners;
             }
             // 3 cells on 2nd diagonal line (top right to bottom left) has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[2].MarkId) && (marks[6].MarkId == marks[2].MarkId))
             {
                 gameEnd = true;//set game to End
-                winners.Add(marks[2]);
-                winners.Add(marks[4]);
-                winners.Add(marks[6]);
+                winners.Add(2);
+                winners.Add(4);
+                winners.Add(6);
                 return winners;
             }
 
@@ -170,12 +170,13 @@ namespace TicTacToeLibrary
             {
                 gameEnd = true;
             }
+
             return null; //return null list if the cells are all marked
            
         }
 
         //Helper method
-        private void createNewGame()
+        public void createNewGame()
         {
             //clear all cells in current game
             marks.Clear();
