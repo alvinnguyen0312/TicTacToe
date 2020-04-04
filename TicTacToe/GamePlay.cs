@@ -8,30 +8,40 @@ using System.ServiceModel;
 namespace TicTacToeLibrary
 {
     //define a Service contract for GamePlay class
-    //[ServiceContract]
-    //public interface IGame
-    //{
-    //    [OperationContract]
-    //    void Play(bool player1Try, int cellPosition);
-    //    [OperationContract]
-    //    string getMark(int cellPosition);
-    //    [OperationContract]
-    //    List<Mark> checkWinner();
-    //    bool GameEnd {[OperationContract] get; }
-    //    bool Player1Turn { [OperationContract] get; [OperationContract] set; }
-    //}
-    //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    //public class GamePlay : IGame
-    public class GamePlay
+    [ServiceContract]
+    public interface IGame
+    {
+        [OperationContract]
+        bool Play(bool player1Try, int cellPosition);
+        [OperationContract]
+        string GetMark(int cellPosition);
+        [OperationContract]
+        List<int> CheckWinner();
+        //[OperationContract]
+        //void CountScores();
+        [OperationContract]
+        void CreateNewGame();
+        bool GameEnd { [OperationContract] get; }
+        bool Player1Turn { [OperationContract] get; [OperationContract] set; }
+        int Player1Score { [OperationContract] get; }
+        int Player2Score { [OperationContract] get; }
+
+    }
+
+
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public class GamePlay : IGame
+    //public class GamePlay
     {
         private List<Mark> marks = null;
         private bool gameEnd;
         private bool player1Turn;
+        private int scorePlayer1 = 0, scorePlayer2 = 0;
         //Constructor
         public GamePlay()
         {
             marks = new List<Mark>();
-            createNewGame();
+            CreateNewGame();
         }
         /// <summary>
         /// get the game end status
@@ -53,15 +63,31 @@ namespace TicTacToeLibrary
             }
         }
         /// <summary>
+        /// get score of first player
+        /// </summary>
+        public int Player1Score
+        {
+            get { return scorePlayer1; }
+        }
+        /// <summary>
+        /// get score of secondplayer
+        /// </summary>
+        public int Player2Score
+        {
+            get { return scorePlayer2; }
+        }
+        /// <summary>
         /// Method play() will set player turn and mark type 
         /// </summary>
         /// <param name="player1Try"></param>
         /// <param name="cellPosition"></param>
-        public void Play (bool player1Try, int cellPosition)
+        public bool Play(bool player1Try, int cellPosition)
         {
+            bool isEmptyCell = false;
             //if the selected cell has been empty, then move forwards with player turn and mark set up, or else do nothing
             if (marks[cellPosition].MarkId == Mark.MarkID.Blank)
             {
+                isEmptyCell = true;
                 //player 1 turn will mark X to blank cell
                 if (player1Try)
                 {
@@ -74,28 +100,31 @@ namespace TicTacToeLibrary
                     player1Turn = true;
                 }
             }
+
+            return isEmptyCell;
         }
 
-        public string getMark(int cellPosition)
+        public string GetMark(int cellPosition)
         {
             return marks[cellPosition].ToString();
         }
+
         /// <summary>
         /// this method check winning pattern and return a list of cells that form the that winning pattern
         /// </summary>
         /// <returns></returns>
-        public List<int> checkWinner() //@Jason: you can use this return list of winning cells to highlight them in the UI
+        public List<int> CheckWinner()
         {
             List<int> winners = new List<int>();
             //check horizontal line
             // 3 cells on 1st horizontal row has same value
-            if(marks[0].MarkId != Mark.MarkID.Blank && (marks[1].MarkId == marks[0].MarkId) && (marks[2].MarkId == marks[0].MarkId))
+            if (marks[0].MarkId != Mark.MarkID.Blank && (marks[1].MarkId == marks[0].MarkId) && (marks[2].MarkId == marks[0].MarkId))
             {
                 gameEnd = true;//set game to End
                 winners.Add(0);
                 winners.Add(1);
                 winners.Add(2);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd horizontal row has same value
             if (marks[3].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[3].MarkId) && (marks[5].MarkId == marks[3].MarkId))
@@ -104,7 +133,7 @@ namespace TicTacToeLibrary
                 winners.Add(3);
                 winners.Add(4);
                 winners.Add(5);
-                return winners;
+                //return winners;
             }
             // 3 cells on 3rd horizontal row has same value
             if (marks[6].MarkId != Mark.MarkID.Blank && (marks[7].MarkId == marks[6].MarkId) && (marks[8].MarkId == marks[6].MarkId))
@@ -113,7 +142,7 @@ namespace TicTacToeLibrary
                 winners.Add(6);
                 winners.Add(7);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
 
             //check vertical line
@@ -124,7 +153,7 @@ namespace TicTacToeLibrary
                 winners.Add(0);
                 winners.Add(3);
                 winners.Add(6);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd vertical column has same value
             if (marks[1].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[1].MarkId) && (marks[7].MarkId == marks[1].MarkId))
@@ -133,7 +162,7 @@ namespace TicTacToeLibrary
                 winners.Add(1);
                 winners.Add(4);
                 winners.Add(7);
-                return winners;
+                //return winners;
             }
             // 3 cells on 3rd vertical column has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[5].MarkId == marks[2].MarkId) && (marks[8].MarkId == marks[2].MarkId))
@@ -142,7 +171,7 @@ namespace TicTacToeLibrary
                 winners.Add(2);
                 winners.Add(5);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
 
             //check diagonal line
@@ -153,7 +182,7 @@ namespace TicTacToeLibrary
                 winners.Add(0);
                 winners.Add(4);
                 winners.Add(8);
-                return winners;
+                //return winners;
             }
             // 3 cells on 2nd diagonal line (top right to bottom left) has same value
             if (marks[2].MarkId != Mark.MarkID.Blank && (marks[4].MarkId == marks[2].MarkId) && (marks[6].MarkId == marks[2].MarkId))
@@ -162,26 +191,45 @@ namespace TicTacToeLibrary
                 winners.Add(2);
                 winners.Add(4);
                 winners.Add(6);
-                return winners;
+                //return winners;
             }
 
             //if all cells are marked and gameEnd is still false, set the gameEnd to true
-            if(!marks.Any(mark => mark.MarkId == Mark.MarkID.Blank)) //no more blank cell
+            if (!marks.Any(mark => mark.MarkId == Mark.MarkID.Blank)) //no more blank cell
             {
                 gameEnd = true;
             }
 
-            return null; //return null list if the cells are all marked
-           
+            if (winners.Count != 0)
+                CountScores();
+
+            return winners; //return null list if the cells are all marked
+
         }
 
-        //Helper method
-        public void createNewGame()
+        public void CountScores()
+        {
+            //if (gameEnd && !marks.Any(mark => mark.MarkId == Mark.MarkID.Blank))
+            //{
+            //    //do nothing to scores if games end with all cells marked and no one win
+            //}
+            if (gameEnd && player1Turn)
+            {
+                scorePlayer2 += 1;
+            }
+            else if (gameEnd && !player1Turn)
+            {
+                scorePlayer1 += 1;
+            }
+        }
+
+
+        public void CreateNewGame()
         {
             //clear all cells in current game
             marks.Clear();
             //create a list of blank cells (9 cells)
-            for(int i = 0; i < 9; ++i)
+            for (int i = 0; i < 9; ++i)
             {
                 marks.Add(new Mark(Mark.MarkID.Blank));
             }
@@ -191,5 +239,5 @@ namespace TicTacToeLibrary
             gameEnd = false;
         }
     }
-   
+
 }
