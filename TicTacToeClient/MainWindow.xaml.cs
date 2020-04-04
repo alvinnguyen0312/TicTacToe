@@ -13,7 +13,7 @@ namespace TicTacToeClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private GamePlay tictactoe = null;
+        private IGame tictactoe = null;
         public MainWindow()
         {
             InitializeComponent();
@@ -26,7 +26,7 @@ namespace TicTacToeClient
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
             // Reset the list of Marks
-            tictactoe.createNewGame();
+            tictactoe.CreateNewGame();
 
             // Reset the UI contents
             ResetUIContents();
@@ -42,6 +42,7 @@ namespace TicTacToeClient
                 button.Content = "";
                 button.Background = Brushes.Transparent;
                 button.IsEnabled = true;
+                button.Opacity = 1;
             });
 
             // Reset the scores on the UI
@@ -58,7 +59,6 @@ namespace TicTacToeClient
         {
             if (tictactoe.GameEnd)
             {
-                //tictactoe.createNewGame();
                 return;
             }
 
@@ -84,13 +84,13 @@ namespace TicTacToeClient
             tictactoe.Play(player1Turn, index);
 
             // Get the mark based on the player and available index
-            var mark = tictactoe.getMark(index);
+            var mark = tictactoe.GetMark(index);
 
             // Assign the mark to the button content
             button.Content = mark;
 
             // Check Winner
-            List<int> marks = tictactoe.checkWinner();
+            List<int> marks = tictactoe.CheckWinner();
 
             if (marks != null)
             {
@@ -140,7 +140,17 @@ namespace TicTacToeClient
                     }
                 } // end foreach
 
-                //HoldButton();
+                if(tictactoe.GameEnd)
+                // Count the score in the server
+                tictactoe.CountScores();
+
+                // Get the score from the server
+                if (player1Turn)
+                    TextBoxPlayerAScore.Text = tictactoe.Player1Score.ToString();
+                else
+                    TextBoxPlayerBScore.Text = tictactoe.Player2Score.ToString();
+
+
             }
 
             if (player1Turn && !tictactoe.GameEnd)

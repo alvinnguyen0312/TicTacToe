@@ -21,8 +21,22 @@ namespace TicTacToeLibrary
     //    bool Player1Turn { [OperationContract] get; [OperationContract] set; }
     //}
     //[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    //public class GamePlay : IGame
-    public class GamePlay
+
+    public interface IGame
+    {
+        void CreateNewGame();
+        void Play(bool player1Try, int cellPosition);
+        string GetMark(int cellPosition);
+        List<int> CheckWinner();
+        void CountScores();
+        bool GameEnd { get; }
+        bool Player1Turn { get; set; }
+        int Player1Score { get; }
+        int Player2Score { get; }
+    }
+
+    public class GamePlay : IGame
+    //public class GamePlay
     {
         private List<Mark> marks = null;
         private bool gameEnd;
@@ -32,7 +46,7 @@ namespace TicTacToeLibrary
         public GamePlay()
         {
             marks = new List<Mark>();
-            createNewGame();
+            CreateNewGame();
         }
         /// <summary>
         /// get the game end status
@@ -91,15 +105,16 @@ namespace TicTacToeLibrary
             }
         }
 
-        public string getMark(int cellPosition)
+        public string GetMark(int cellPosition)
         {
             return marks[cellPosition].ToString();
         }
+
         /// <summary>
         /// this method check winning pattern and return a list of cells that form the that winning pattern
         /// </summary>
         /// <returns></returns>
-        public List<int> checkWinner() //@Jason: you can use this return list of winning cells to highlight them in the UI
+        public List<int> CheckWinner()
         {
             List<int> winners = new List<int>();
             //check horizontal line
@@ -192,11 +207,11 @@ namespace TicTacToeLibrary
 
         public void CountScores()
         {
-            if(gameEnd && !marks.Any(mark => mark.MarkId == Mark.MarkID.Blank))
+            if (gameEnd && !marks.Any(mark => mark.MarkId == Mark.MarkID.Blank))
             {
                 //do nothing to scores if games end with all cells marked and no one win
             }
-            else if(gameEnd && player1Turn)
+            else if (gameEnd && player1Turn)
             {
                 scorePlayer2 += 1;
             }
@@ -206,8 +221,8 @@ namespace TicTacToeLibrary
             }
         }
 
-        //Helper method
-        public void createNewGame()
+        
+        public void CreateNewGame()
         {
             //clear all cells in current game
             marks.Clear();
