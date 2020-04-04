@@ -7,23 +7,7 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         Title="Tic Tac Toe" Height="660" Width="820">
-
-    <Window.Resources>
-        <!--<Style TargetType="Button" x:Key="TicTacToeButton" >
-            --><!--https://stackoverflow.com/questions/17681022/set-cornerradius-on-button-template--><!--
-            <Setter Property="FontSize" Value="100"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="10" BorderBrush="Black" BorderThickness="2" >
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}"  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
-    </Window.Resources>
-
+    
     <Border>
         <StackPanel>
 
@@ -33,15 +17,9 @@
                     <ColumnDefinition Width="500*"/>
                     <ColumnDefinition Width="145*"/>
                 </Grid.ColumnDefinitions>
+                
+                <!-- Player A Score -->
                 <GroupBox Header="Player A" HorizontalAlignment="Center" VerticalAlignment="Center" Height="120" Width="100" Grid.Column="0" Margin="26,200,19,200" >
-                    <!--<Button x:Name="ButtonPlayerAScore" FontSize="100" Background="LightGoldenrodYellow" BorderThickness="2" BorderBrush="Black" >
-                        <Button.Resources>
-                            <Style TargetType="{x:Type Border}">
-                                <Setter Property="CornerRadius" Value="20"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>-->
-
                     <TextBox x:Name="TextBoxPlayerAScore" FontSize="60" Background="LightGoldenrodYellow" BorderThickness="2" BorderBrush="Black" TextAlignment="Center"  IsReadOnly="True" VerticalAlignment="Center">
                         0
                         <TextBox.Resources>
@@ -50,9 +28,8 @@
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
-
-
                 </GroupBox>
+                
                 <!-- Game Boarder-->
                 <GroupBox Header="GAME BOARD" HorizontalAlignment="Center" VerticalAlignment="Center" Height="500" Width="500" Grid.Column="1" Margin="1,0,0,0" >
                     <Grid x:Name="GameBoardContainer">
@@ -138,6 +115,8 @@
 
                     </Grid>
                 </GroupBox>
+                
+                <!-- Player B Score -->
                 <GroupBox Header="Player B" HorizontalAlignment="Center" VerticalAlignment="Center" Height="120" Width="100" Grid.Column="2" Margin="20,200,28,200">
                     <TextBox x:Name="TextBoxPlayerBScore" FontSize="60" Background="White" BorderThickness="2" BorderBrush="Black" TextAlignment="Center"  IsReadOnly="True" VerticalAlignment="Center">
                         0
@@ -151,20 +130,22 @@
 
             </Grid>
 
-            <!-- Buttons and Game Scores -->
+            <!-- Buttons and Result TextBox -->
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="ButtonStart" Background="DarkSeaGreen" Content="START AGAIN" HorizontalAlignment="Center" Height="70" VerticalAlignment="Center" Width="150" Margin="50 30 0 0" Grid.Column="0"  FontSize="20" Click="ButtonStart_Click">
+                <Button x:Name="ButtonStart" Background="DarkSeaGreen" Content="START AGAIN" HorizontalAlignment="Right" Height="70" VerticalAlignment="Center" Width="150" Margin="50 10 10 10" Grid.Column="0"  FontSize="20" Click="ButtonStart_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="20"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button x:Name="ButtonExit"  Background="IndianRed" Content="EXIT" HorizontalAlignment="Center" Height="70" VerticalAlignment="Center" Width="150" Margin="0 30 50 0" Grid.Column="1"  FontSize="20" Click="ButtonExit_Click">
+                <TextBox x:Name="TextBoxResult" FontSize="20" Background="White" BorderThickness="0" TextAlignment="Center"  IsReadOnly="True" VerticalAlignment="Center" Grid.Column="1"></TextBox>
+                <Button x:Name="ButtonExit"  Background="IndianRed" Content="EXIT" HorizontalAlignment="Left" Height="70" VerticalAlignment="Center" Width="150" Margin="10 10 50 10" Grid.Column="2"  FontSize="20" Click="ButtonExit_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="20"/>
