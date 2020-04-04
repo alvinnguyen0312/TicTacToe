@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace TicTacToeLibrary
 {
+    [DataContract]
     public class Mark
     {
         //Define mark types
         public enum MarkID { X, O, Blank};
 
+        [DataMember]
         //Public methods and properties
         public MarkID MarkId { get; private set; }
 
@@ -18,8 +21,7 @@ namespace TicTacToeLibrary
         {
             return MarkId.ToString();
         }
-
-        //Constructor   ??
+        //Constructor
         internal Mark(MarkID markID)
         {
             MarkId = markID;

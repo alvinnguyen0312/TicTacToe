@@ -5,13 +5,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using TicTacToeLibrary;
+using System.ServiceModel;
 
 namespace TicTacToeClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    [CallbackBehavior(ConcurrencyMode=ConcurrencyMode.Reentrant,UseSynchronizationContext =false)]
+    public partial class MainWindow : Window, ICallback
     {
         private IGame tictactoe = null;
         public MainWindow()
@@ -19,7 +21,19 @@ namespace TicTacToeClient
             InitializeComponent();
 
             // Start a new game
-            tictactoe = new GamePlay();
+            //tictactoe = new GamePlay();
+            try
+            {
+                DuplexChannelFactory<IGame> channel = new DuplexChannelFactory<IGame>(this, "GameEndPoint");
+                tictactoe = channel.CreateChannel();
+
+                // Register for the callbacks
+                tictactoe.RegisterForCallbacks();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
@@ -52,6 +66,9 @@ namespace TicTacToeClient
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
+            if (tictactoe != null)
+                // Quitting, so unregister from the client callbacks
+                tictactoe.UnregisterFromCallbacks();
             this.Close();
         }
 
@@ -179,6 +196,25 @@ namespace TicTacToeClient
                 button.IsEnabled = false;
                 button.Background = Brushes.Transparent;
             });
+        }
+
+        // Callback contract implementation
+
+        private delegate void ClientUpdateDelegate(CallbackInfo info);
+
+        public void UpdateGameUI(CallbackInfo info)
+        {
+            if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
+            {
+                // Update the GUI
+                TextBoxPlayerAScore.Text = info.Player1Score.ToString();
+                TextBoxPlayerBScore.Text =info.Player2Score.ToString();
+            }
+            else
+            {
+                // Not the dispatcher thread that's running this method!
+                this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGameUI), info);
+            }
         }
     }
 }

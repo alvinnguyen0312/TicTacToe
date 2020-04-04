@@ -16,13 +16,14 @@ namespace TicTacToeService
             try
             {
                 // Register the service address
-                servHost = new ServiceHost(typeof(GamePlay), new Uri("net.tcp://localhost:13200/TicTacToeLibrary/"));
-
+                // servHost = new ServiceHost(typeof(GamePlay), new Uri("net.tcp://localhost:13200/TicTacToeLibrary/"));
+                servHost = new ServiceHost(typeof(GamePlay));
+ 
                 // Register the service contract and binding
-                servHost.AddServiceEndpoint(typeof(IGame), new NetTcpBinding(), "GameService");
+                //servHost.AddServiceEndpoint(typeof(IGame), new NetTcpBinding(), "GameService");
 
-                // Run the service
-                servHost.Open();
+                 // Run the service
+                 servHost.Open();
                 Console.WriteLine("Service started. Please any key to quit.");
             }
             catch (Exception ex)

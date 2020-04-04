@@ -7,27 +7,37 @@ using System.ServiceModel;
 
 namespace TicTacToeLibrary
 {
-    //define a Service contract for GamePlay class
+    //define a callback contract for client to implement
     [ServiceContract]
+    public interface ICallback
+    {
+        [OperationContract(IsOneWay = true)]
+        void UpdateGameUI(CallbackInfo info);
+    }
+    //define a Service contract for GamePlay class
+    [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IGame
     {
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void Play(bool player1Try, int cellPosition);
         [OperationContract]
         string GetMark(int cellPosition);
         [OperationContract]
         List<int> CheckWinner();
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void CountScores();
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void CreateNewGame();
         bool GameEnd { [OperationContract] get; }
         bool Player1Turn { [OperationContract] get; [OperationContract] set; }
         int Player1Score { [OperationContract] get; }
         int Player2Score { [OperationContract] get; }
+        [OperationContract(IsOneWay = true)]
+        void RegisterForCallbacks();
+        [OperationContract(IsOneWay = true)]
+        void UnregisterFromCallbacks();
 
     }
-
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GamePlay : IGame
@@ -37,12 +47,40 @@ namespace TicTacToeLibrary
         private bool gameEnd;
         private bool player1Turn;
         private int scorePlayer1 = 0, scorePlayer2 = 0;
+        private HashSet<ICallback> callbacks = new HashSet<ICallback>();
         //Constructor
         public GamePlay()
         {
             marks = new List<Mark>();
             CreateNewGame();
         }
+
+        public void RegisterForCallbacks()
+        {
+            // A client calls this method when it's loading!
+
+            // Identify which client is calling this method
+            ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
+
+            // Add the client's callback (proxy) object to the collection
+            if (!callbacks.Contains(cb))
+                callbacks.Add(cb);
+        }
+
+        public void UnregisterFromCallbacks()
+        {
+            // A client calls this method when it's quitting!
+
+            // Identify which client is calling this method
+            ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
+
+            // Remove the client's callback object from the collection
+            // so that the Shoe object won't try to call a method on a 
+            // "dangling reference"
+            if (callbacks.Contains(cb))
+                callbacks.Remove(cb);
+        }
+
         /// <summary>
         /// get the game end status
         /// </summary>
@@ -97,6 +135,7 @@ namespace TicTacToeLibrary
                     marks[cellPosition] = new Mark(Mark.MarkID.O);
                     player1Turn = true;
                 }
+                updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
             }
         }
 
@@ -210,9 +249,10 @@ namespace TicTacToeLibrary
             {
                 scorePlayer1 += 1;
             }
+            updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
         }
 
-        
+
         public void CreateNewGame()
         {
             //clear all cells in current game
@@ -226,6 +266,18 @@ namespace TicTacToeLibrary
             player1Turn = true;
             //set gameEnd
             gameEnd = false;
+
+            updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
+        }
+
+        //helper method
+        private void updateAllClients(bool gameEnd, bool p1turn, int p1score, int p2score)
+        {
+            CallbackInfo info = new CallbackInfo(gameEnd, p1turn, p1score, p2score);
+
+            foreach (ICallback cb in callbacks)
+                if (cb != null)
+                    cb.UpdateGameUI(info);
         }
     }
    
