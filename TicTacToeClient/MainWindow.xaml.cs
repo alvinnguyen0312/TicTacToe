@@ -69,111 +69,125 @@ namespace TicTacToeClient
 
         private void ButtonExit_Click(object sender, RoutedEventArgs e)
         {
-            if (tictactoe != null)
-                // Quitting, so unregister from the client callbacks
-                tictactoe.UnregisterFromCallbacks();
-            this.Close();
+            try
+            {
+                if (tictactoe != null)
+                    // Quitting, so unregister from the client callbacks
+                    tictactoe.UnregisterFromCallbacks();
+                this.Close();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (tictactoe.GameEnd)
-            {
-                return;
-            }
-
-            var button = (Button)sender;
-
-            // Get the row and coloum of this button
-            var row = Grid.GetRow(button);
-            var column = Grid.GetColumn(button);
-
-            // Find the index
-            var index = column + (row * 3);
-
-            // Get which player's turn
-            var player1Turn = tictactoe.Player1Turn;
-
-            // Play
-            if (tictactoe.Play(player1Turn, index))
-            {
-
-                // Change Player B's mark red
-                if (!player1Turn)
-                    button.Foreground = Brushes.Red;
-                else
-                    button.Foreground = Brushes.Black;
-
-
-                // Get the mark based on the player and available index
-                var mark = tictactoe.GetMark(index);
-
-                // Assign the mark to the button content
-                button.Content = mark;
-
-                // Check Winner
-                List<int> marks = tictactoe.CheckWinner();
-
-                if (marks.Count != 0) // If the games ends and someone wins
+            try 
+            { 
+                if (tictactoe.GameEnd)
                 {
-                    foreach (var i in marks)
-                    {
-                        switch (i)
-                        {
-                            case 0:
-                                Button0x0.Background = Brushes.Goldenrod;
-                                Button0x0.Opacity = 0.5;
-                                break;
-                            case 1:
-                                Button0x1.Background = Brushes.Goldenrod;
-                                Button0x1.Opacity = 0.5;
-                                break;
-                            case 2:
-                                Button0x2.Background = Brushes.Goldenrod;
-                                Button0x2.Opacity = 0.5;
-                                break;
-                            case 3:
-                                Button1x0.Background = Brushes.Goldenrod;
-                                Button1x0.Opacity = 0.5;
-                                break;
-                            case 4:
-                                Button1x1.Background = Brushes.Goldenrod;
-                                Button1x1.Opacity = 0.5;
-                                break;
-                            case 5:
-                                Button1x2.Background = Brushes.Goldenrod;
-                                Button1x2.Opacity = 0.5;
-                                break;
-                            case 6:
-                                Button2x0.Background = Brushes.Goldenrod;
-                                Button2x0.Opacity = 0.5;
-                                break;
-                            case 7:
-                                Button2x1.Background = Brushes.Goldenrod;
-                                Button2x1.Opacity = 0.5;
-                                break;
-                            case 8:
-                                Button2x2.Background = Brushes.Goldenrod;
-                                Button2x2.Opacity = 0.5;
-                                break;
-                            default:
-                                break;
+                    return;
+                }
 
-                        }
-                    } // end foreach
+                var button = (Button)sender;
 
-                    // Get the score from the server
-                    if (player1Turn)
-                    {
-                        TextBoxPlayerAScore.Text = tictactoe.Player1Score.ToString();
-                        //TextBoxResult.Text = "Player A Won!";
-                    }
+                // Get the row and coloum of this button
+                var row = Grid.GetRow(button);
+                var column = Grid.GetColumn(button);
+
+                // Find the index
+                var index = column + (row * 3);
+
+                // Get which player's turn
+                var player1Turn = tictactoe.Player1Turn;
+
+                // Play
+                if (tictactoe.Play(player1Turn, index))
+                {
+
+                    // Change Player B's mark red
+                    if (!player1Turn)
+                        button.Foreground = Brushes.Red;
                     else
+                        button.Foreground = Brushes.Black;
+
+
+                    // Get the mark based on the player and available index
+                    var mark = tictactoe.GetMark(index);
+
+                    // Assign the mark to the button content
+                    button.Content = mark;
+
+                    // Check Winner
+                    List<int> marks = tictactoe.CheckWinner();
+
+                    if (marks.Count != 0) // If the games ends and someone wins
                     {
-                        TextBoxPlayerBScore.Text = tictactoe.Player2Score.ToString();
-                        //TextBoxResult.Text = "Player B Won!";
+                        foreach (var i in marks)
+                        {
+                            switch (i)
+                            {
+                                case 0:
+                                    Button0x0.Background = Brushes.Goldenrod;
+                                    Button0x0.Opacity = 0.5;
+                                    break;
+                                case 1:
+                                    Button0x1.Background = Brushes.Goldenrod;
+                                    Button0x1.Opacity = 0.5;
+                                    break;
+                                case 2:
+                                    Button0x2.Background = Brushes.Goldenrod;
+                                    Button0x2.Opacity = 0.5;
+                                    break;
+                                case 3:
+                                    Button1x0.Background = Brushes.Goldenrod;
+                                    Button1x0.Opacity = 0.5;
+                                    break;
+                                case 4:
+                                    Button1x1.Background = Brushes.Goldenrod;
+                                    Button1x1.Opacity = 0.5;
+                                    break;
+                                case 5:
+                                    Button1x2.Background = Brushes.Goldenrod;
+                                    Button1x2.Opacity = 0.5;
+                                    break;
+                                case 6:
+                                    Button2x0.Background = Brushes.Goldenrod;
+                                    Button2x0.Opacity = 0.5;
+                                    break;
+                                case 7:
+                                    Button2x1.Background = Brushes.Goldenrod;
+                                    Button2x1.Opacity = 0.5;
+                                    break;
+                                case 8:
+                                    Button2x2.Background = Brushes.Goldenrod;
+                                    Button2x2.Opacity = 0.5;
+                                    break;
+                                default:
+                                    break;
+
+                            }
+                        } // end foreach
+
+                        // Get the score from the server
+                        if (player1Turn)
+                        {
+                            TextBoxPlayerAScore.Text = tictactoe.Player1Score.ToString();
+                            //TextBoxResult.Text = "Player A Won!";
+                        }
+                        else
+                        {
+                            TextBoxPlayerBScore.Text = tictactoe.Player2Score.ToString();
+                            //TextBoxResult.Text = "Player B Won!";
+                        }
                     }
-                }                
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
