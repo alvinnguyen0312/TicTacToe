@@ -18,13 +18,16 @@ namespace TicTacToeLibrary
         public int Player1Score { get; set; }
         [DataMember]
         public int Player2Score { get; set; }
+        [DataMember]
+        public string Result { get; set; }
 
-        public CallbackInfo(bool gameEnd, bool p1turn, int p1score, int p2score)
+        public CallbackInfo(bool gameEnd, bool p1turn, int p1score, int p2score, string result)
         {
             GameEnd = gameEnd;
             Player1Turn = p1turn;
             Player1Score = p1score;
             Player2Score = p2score;
+            Result = result;
         }
     }
 }

@@ -135,7 +135,7 @@ namespace TicTacToeLibrary
                     marks[cellPosition] = new Mark(Mark.MarkID.O);
                     player1Turn = true;
                 }
-                updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
+                updateAllClients(gameEnd);
             }
             return isEmptyCell;
         }
@@ -253,7 +253,7 @@ namespace TicTacToeLibrary
             {
                 scorePlayer1 += 1;
             }
-            updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
+            updateAllClients(gameEnd);
         }
 
 
@@ -271,13 +271,27 @@ namespace TicTacToeLibrary
             //set gameEnd
             gameEnd = false;
 
-            updateAllClients(gameEnd, player1Turn, scorePlayer1, scorePlayer2);
+            updateAllClients(gameEnd);
         }
 
         //helper method
-        private void updateAllClients(bool gameEnd, bool p1turn, int p1score, int p2score)
+        private void updateAllClients(bool gameEnd)
         {
-            CallbackInfo info = new CallbackInfo(gameEnd, p1turn, p1score, p2score);
+            string result = "";
+            if (gameEnd && player1Turn)
+            {
+                result = "Player B won!";
+            }
+            else if (gameEnd && !player1Turn)
+            {
+                result = "Player A won!";
+            }
+            else if(!marks.Any(mark => mark.MarkId == Mark.MarkID.Blank)) //no more blank cell
+            {
+                result = "Tie";
+            }
+            
+            CallbackInfo info = new CallbackInfo(gameEnd, player1Turn, scorePlayer1, scorePlayer2, result);
 
             foreach (ICallback cb in callbacks)
                 if (cb != null)

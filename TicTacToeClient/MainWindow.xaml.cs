@@ -166,39 +166,14 @@ namespace TicTacToeClient
                     if (player1Turn)
                     {
                         TextBoxPlayerAScore.Text = tictactoe.Player1Score.ToString();
-                        TextBoxResult.Text = "Player A Won!";
+                        //TextBoxResult.Text = "Player A Won!";
                     }
                     else
                     {
                         TextBoxPlayerBScore.Text = tictactoe.Player2Score.ToString();
-                        TextBoxResult.Text = "Player B Won!";
+                        //TextBoxResult.Text = "Player B Won!";
                     }
-                }
-                else // If the game ties or it doen't finish yet
-                {
-
-                    if (tictactoe.GameEnd)
-                    {
-                        TextBoxResult.Text = "Tie!";
-                    }
-                    else
-                    {
-                        if (player1Turn)
-                        {
-                            // Change Background color to indicate the next player turn
-                            TextBoxPlayerAScore.Background = Brushes.White;
-                            TextBoxPlayerBScore.Background = Brushes.LightGoldenrodYellow;
-                        }
-                        else
-                        {
-                            // Change Background color to indicate the next player turn
-                            TextBoxPlayerAScore.Background = Brushes.LightGoldenrodYellow;
-                            TextBoxPlayerBScore.Background = Brushes.White;
-                        }
-
-                    }
-                }
-   
+                }                
             }
         }
 
@@ -213,6 +188,19 @@ namespace TicTacToeClient
                 // Update the GUI
                 TextBoxPlayerAScore.Text = info.Player1Score.ToString();
                 TextBoxPlayerBScore.Text =info.Player2Score.ToString();
+                TextBoxResult.Text = info.Result;
+                if (info.Player1Turn)
+                {
+                    // Change Background color to indicate the next player turn                  
+                    TextBoxPlayerAScore.Background = Brushes.LightGoldenrodYellow;
+                    TextBoxPlayerBScore.Background = Brushes.White;
+                }
+                else
+                {
+                    // Change Background color to indicate the next player turn
+                    TextBoxPlayerAScore.Background = Brushes.White;
+                    TextBoxPlayerBScore.Background = Brushes.LightGoldenrodYellow;
+                }
             }
             else
             {
