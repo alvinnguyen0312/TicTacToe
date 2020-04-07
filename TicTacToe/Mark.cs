@@ -16,15 +16,18 @@ namespace TicTacToeLibrary
         [DataMember]
         //Public methods and properties
         public MarkID MarkId { get; private set; }
+        [DataMember]
+        public int CellPosition { get; private set; }
 
         public override string ToString()
         {
             return MarkId.ToString();
         }
         //Constructor
-        internal Mark(MarkID markID)
+        internal Mark(MarkID markID, int cellPosition)
         {
             MarkId = markID;
+            CellPosition = cellPosition;
         }
 
     }

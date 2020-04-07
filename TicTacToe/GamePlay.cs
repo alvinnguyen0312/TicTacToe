@@ -4,32 +4,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
+using System.Threading;
 
 namespace TicTacToeLibrary
 {
     //define a callback contract for client to implement
     [ServiceContract]
-    public interface ICallback
+    public interface ICallback // Data from Client to Service
     {
         [OperationContract(IsOneWay = true)]
         void UpdateGameUI(CallbackInfo info);
     }
-    //define a Service contract for GamePlay class
-    [ServiceContract(CallbackContract = typeof(ICallback))]
+
+    // Define a Service contract for GamePlay class
+    // And link two ServiceContract together to communicate.
+    [ServiceContract(CallbackContract = typeof(ICallback))] // Data from Service to Client
     public interface IGame
     {
+
         [OperationContract]
-        bool Play(bool player1Try, int cellPosition);
-        [OperationContract]
-        string GetMark(int cellPosition);
-        [OperationContract]
-        List<int> CheckWinner();
+        Mark Play(bool player1Try, int cellPosition);
+        //[OperationContract]
+        //string GetMark(int cellPosition);
+        [OperationContract(IsOneWay = true)]
+        void CheckWinner();
         [OperationContract(IsOneWay = true)]
         void CreateNewGame();
-        bool GameEnd { [OperationContract] get; }
-        bool Player1Turn { [OperationContract] get; [OperationContract] set; }
-        int Player1Score { [OperationContract] get; }
-        int Player2Score { [OperationContract] get; }
+        [OperationContract(IsOneWay = true)]
+        void Repopulate();
+        bool GameEnd { [OperationContract]get; }
+        bool Player1Turn { [OperationContract]get; }
+        int Player1Score { [OperationContract]get; }
+        int Player2Score { [OperationContract]get; }
         [OperationContract(IsOneWay = true)]
         void RegisterForCallbacks();
         [OperationContract(IsOneWay = true)]
@@ -37,6 +43,7 @@ namespace TicTacToeLibrary
 
     }
 
+    // To use the same object when the two clients execute
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class GamePlay : IGame
     //public class GamePlay
@@ -45,22 +52,33 @@ namespace TicTacToeLibrary
         private bool gameEnd;
         private bool player1Turn;
         private int scorePlayer1 = 0, scorePlayer2 = 0;
+        private string result = "";
+        private static uint objCount = 0;
+        private uint objNum;
+        private List<int> winningCells = null;
+        private Mark selectedMark = null;
+
+        // HashSet requre a unique value
+        // It holds bunch of client objects
         private HashSet<ICallback> callbacks = new HashSet<ICallback>();
+
         //Constructor
         public GamePlay()
         {
+            objNum = ++objCount;
+            Console.WriteLine($"Creating GamePlay Object #{objNum}");
+
             marks = new List<Mark>();
-            CreateNewGame();
+            Repopulate();
         }
 
+        // A client calls this method when it's loading!
         public void RegisterForCallbacks()
-        {
-            // A client calls this method when it's loading!
-
+        {       
             // Identify which client is calling this method
             ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
 
-            // Add the client's callback (proxy) object to the collection
+            // // If there is no duplicate, add the client's callback (proxy) object to the collection
             if (!callbacks.Contains(cb))
                 callbacks.Add(cb);
         }
@@ -112,44 +130,59 @@ namespace TicTacToeLibrary
         {
             get { return scorePlayer2; }
         }
+
+
+        
+
         /// <summary>
         /// Method play() will set player turn and mark type 
         /// </summary>
         /// <param name="player1Try"></param>
         /// <param name="cellPosition"></param>
-        public bool Play (bool player1Try, int cellPosition)
+        public Mark Play (bool player1Try, int cellPosition)
         {
-            bool isEmptyCell = false;
+            
             //if the selected cell has been empty, then move forwards with player turn and mark set up, or else do nothing
             if (marks[cellPosition].MarkId == Mark.MarkID.Blank)
             {
-                isEmptyCell = true;
+                
                 //player 1 turn will mark X to blank cell
                 if (player1Try)
                 {
-                    marks[cellPosition] = new Mark(Mark.MarkID.X);
+                    marks[cellPosition] = new Mark(Mark.MarkID.X, cellPosition);
                     player1Turn = false;
                 }
                 else//player 2 turn will mark O to blank cell
                 {
-                    marks[cellPosition] = new Mark(Mark.MarkID.O);
+                    marks[cellPosition] = new Mark(Mark.MarkID.O, cellPosition);
                     player1Turn = true;
                 }
-                updateAllClients(gameEnd);
+                //updateAllClients(gameEnd);
+
+                Console.WriteLine($"GamePlay Object #{objNum} Playing with {marks[cellPosition]}.");
             }
-            return isEmptyCell;
+            else
+            {
+                // If the selected cell has been used, then return null.
+                return null;
+            }
+
+
+            selectedMark = marks[cellPosition];
+
+            return marks[cellPosition];
         }
 
-        public string GetMark(int cellPosition)
-        {
-            return marks[cellPosition].ToString();
-        }
+        //public string GetMark(int cellPosition)
+        //{
+        //    return marks[cellPosition].ToString();
+        //}
 
         /// <summary>
         /// this method check winning pattern and return a list of cells that form the that winning pattern
         /// </summary>
         /// <returns></returns>
-        public List<int> CheckWinner()
+        public void CheckWinner()
         {
             List<int> winners = new List<int>();
             //check horizontal line
@@ -230,68 +263,78 @@ namespace TicTacToeLibrary
                 //return winners;
             }
 
-            //if all cells are marked and gameEnd is still false, set the gameEnd to true
+            // If all cells are marked and gameEnd is still false, set the gameEnd to true
             if(!marks.Any(mark => mark.MarkId == Mark.MarkID.Blank)) //no more blank cell
             {
+                result = "Tie!";
                 gameEnd = true;
             }
 
             if (winners.Count != 0)
+            {
+                Console.WriteLine($"GamePlay Object #{objNum} Won.");
                 CountScores();
+            }
 
-            return winners; //return null list if the cells are all marked
+            winningCells = winners;
+
+            UpdateAllClients(gameEnd);          
+
+            //return winners; //return null list if the cells are all marked
            
         }
 
         public void CountScores()
-        {            
+        {
             if (gameEnd && player1Turn)
             {
                 scorePlayer2 += 1;
+                result = "Player 2 Won!";
             }
             else if (gameEnd && !player1Turn)
             {
                 scorePlayer1 += 1;
+                result = "Player 1 Won!";
             }
-            updateAllClients(gameEnd);
+            //updateAllClients(gameEnd);
         }
 
 
-        public void CreateNewGame()
+        public void Repopulate()
         {
             //clear all cells in current game
             marks.Clear();
             //create a list of blank cells (9 cells)
             for(int i = 0; i < 9; ++i)
             {
-                marks.Add(new Mark(Mark.MarkID.Blank));
+                marks.Add(new Mark(Mark.MarkID.Blank, i));
             }
-            //set player1 play first
-            player1Turn = true;
-            //set gameEnd
-            gameEnd = false;
 
-            updateAllClients(gameEnd);
+
+            // Resets member variables
+            player1Turn = true;
+            result = "";
+            gameEnd = false;
+            selectedMark = null;
+
+            UpdateAllClients(gameEnd);
         }
 
-        //helper method
-        private void updateAllClients(bool gameEnd)
+        public void CreateNewGame()
         {
-            string result = "";
-            if (gameEnd && player1Turn)
-            {
-                result = "Player B won!";
-            }
-            else if (gameEnd && !player1Turn)
-            {
-                result = "Player A won!";
-            }
-            else if(!marks.Any(mark => mark.MarkId == Mark.MarkID.Blank)) //no more blank cell
-            {
-                result = "Tie";
-            }
-            
-            CallbackInfo info = new CallbackInfo(gameEnd, player1Turn, scorePlayer1, scorePlayer2, result);
+            Console.WriteLine($"GamePlay Object #{objNum} left.");
+            Repopulate();
+            scorePlayer1 = 0;
+            scorePlayer2 = 0;
+        }
+
+
+
+        //helper method
+        private void UpdateAllClients(bool gameEnd)
+        {
+
+            CallbackInfo info = new CallbackInfo(gameEnd, player1Turn, scorePlayer1, scorePlayer2, result, selectedMark, winningCells);
 
             foreach (ICallback cb in callbacks)
                 if (cb != null)

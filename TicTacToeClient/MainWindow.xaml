@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TicTacToeClient"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="Tic Tac Toe" Height="660" Width="820">
+        Title="Tic Tac Toe" Height="660" Width="820" Closing="Window_Closing">
     
     <Border>
         <StackPanel>
