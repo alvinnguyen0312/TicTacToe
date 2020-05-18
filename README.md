@@ -7,7 +7,7 @@ TicTacToe is designed for multiplayers to play game. Refer to [here](https://en.
 - Track water amount user drink during the day with visual chart
 - Track history record of previous consumption periods (charts)
 - Allow users to set up notification/ interval to remind them to drink water
-## How I built it
+## How it's built
 The application incorporates different assemblies (service host assembly, class library assembly, Windows GUI).
 Three types of contract have been implemented (service contract, data contract and callback contract
 ## App Demo
