@@ -6,6 +6,6 @@ TicTacToe is designed for multiplayers to play game. Refer to [here](https://en.
 - Allow multiple users to play Tictactoe games 
 ## How it's built
 The application incorporates different assemblies (service host assembly, class library assembly, Windows GUI).
-Three types of contract have been implemented (service contract, data contract and callback contract
+Three types of contract have been implemented (service contract, data contract and callback contract)
 ## App Demo
 ![Tictactoe demo](https://github.com/alvinnguyen0312/TicTacToe/blob/master/tictactoe-demo.gif)
